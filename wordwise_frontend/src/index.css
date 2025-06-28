@@ -1,0 +1,10 @@
+body {
+  font-family: 'Playfair Display', serif;
+  margin: 0px;
+}
+
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

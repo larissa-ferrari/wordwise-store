@@ -1,0 +1,48 @@
+.book-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+    width: 200px;
+  }
+  
+  .book-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .book-card img {
+    width: 140px;
+    height: auto;
+    margin: 0.5rem 0;
+  }
+  
+  .book-card h5 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .price {
+    font-size: 1.1rem;
+    color: #f44;
+    margin: 0.5rem 0;
+  }
+  
+  .buy-button {
+    background-color: #f44;
+    border: none;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .buy-button:hover {
+    background-color: #d22;
+  }
+  

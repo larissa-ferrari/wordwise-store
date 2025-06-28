@@ -1,0 +1,15 @@
+.banner {
+    width: 100%;
+    background-color: #ffe2cd;
+    padding: 2rem 0;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .banner-img {
+    max-width: 90%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
