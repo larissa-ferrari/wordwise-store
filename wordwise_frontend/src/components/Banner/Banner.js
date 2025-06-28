@@ -1,6 +1,6 @@
 import React from 'react';
 import './Banner.css';
-import bannerImage from '../assets/banner.png'; // substitua com seu arquivo real
+import bannerImage from '../../assets/banners/banner.png'; 
 
 function Banner() {
   return (

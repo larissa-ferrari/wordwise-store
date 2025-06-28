@@ -1,4 +1,7 @@
-.book-card {
+  .book-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Faz o botão ir para a base */
     background: white;
     border-radius: 8px;
     padding: 1rem;
@@ -6,17 +9,21 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s ease;
     width: 200px;
+    height: 350px; /* altura igual para todos */
   }
+
   
   .book-card:hover {
     transform: translateY(-4px);
   }
   
   .book-card img {
-    width: 140px;
-    height: auto;
-    margin: 0.5rem 0;
+    width: auto;
+    max-height: 150px;
+    margin: 0.5rem auto;
+    object-fit: contain;
   }
+
   
   .book-card h5 {
     font-size: 1.05rem;
@@ -40,9 +47,16 @@
     font-weight: bold;
     cursor: pointer;
     font-size: 0.9rem;
+    margin: 0.5rem 0;
   }
-  
+
   .buy-button:hover {
     background-color: #d22;
   }
   
+  .book-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }

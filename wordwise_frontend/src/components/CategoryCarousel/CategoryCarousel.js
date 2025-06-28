@@ -1,9 +1,9 @@
 import React from 'react';
 import './CategoryCarousel.css';
-import lancamentosImg from '../assets/lancamentos.jpg';
-import maisVendidosImg from '../assets/mais-vendidos.jpg';
-import promocoesImg from '../assets/promocoes.jpg';
-import boxImg from '../assets/box.jpg';
+import lancamentosImg from '../../assets/categories/lancamentos.jpg';
+import maisVendidosImg from '../../assets/categories/mais-vendidos.jpg';
+import promocoesImg from '../../assets/categories/promocoes.jpg';
+import boxImg from '../../assets/categories/box.jpg';
 
 const categories = [
   { name: 'LANÇAMENTOS', image: lancamentosImg },
