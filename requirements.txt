@@ -1,0 +1,4 @@
+django-cors-headers==4.7.0
+drf-yasg==1.21.10
+pipdeptree==2.26.1
+pytest==8.4.1

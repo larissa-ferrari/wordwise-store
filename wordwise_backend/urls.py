@@ -1,43 +1,33 @@
-"""
-URL configuration for wordwise_backend project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
 from django.contrib import admin
-from django.urls import path, re_path, include
-from .settings import schema_view
-from rest_framework.routers import DefaultRouter
-from category.views import CategoriaViewSet
-from user.views import UserViewSet
-from banner.views import BannerViewSet
-from support.views import SuporteViewSet
+from django.urls import path, include
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
-router = DefaultRouter()
-router.register(r"categorias", CategoriaViewSet)
-router.register(r"usuarios", UserViewSet)
-router.register(r"banners", BannerViewSet)
-router.register(r"suportes", SuporteViewSet)
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="API Documentation",
+        default_version="v1",
+        description="Documentação da API do sistema",
+    ),
+    public=True,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include("user.urls")),
-
-    re_path(
-        r"^swagger(?P<format>\.json|\.yaml)$",
-        schema_view.without_ui(cache_timeout=0),
-        name="schema-json",
+    path(
+        "api/",
+        include(
+            [
+                path("", include("user.urls")),
+                path("", include("book.urls")),
+                path("", include("category.urls")),
+                path("", include("order.urls")),
+                path("", include("support.urls")),
+                path("", include("banner.urls")),
+                path("cart/", include("cart.urls")),
+            ]
+        ),
     ),
     path(
         "swagger/",
@@ -45,5 +35,7 @@ urlpatterns = [
         name="schema-swagger-ui",
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
-    path("api/", include(router.urls)),
+    path(
+        "swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"
+    ),
 ]
