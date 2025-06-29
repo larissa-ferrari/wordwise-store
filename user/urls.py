@@ -11,8 +11,8 @@ router.register(r"usuarios", UserViewSet, basename="usuarios")
 router.register(r"clientes", ClienteViewSet, basename="clientes")
 
 urlpatterns = [
-    path("api/login/", LoginView.as_view(), name="login"),
-    path("api/logout/", LogoutView.as_view(), name="logout"),
+    path("usuarios/login/", LoginView.as_view(), name="login"),
+    path("usuarios/logout/", LogoutView.as_view(), name="logout"),
     path(
         "usuarios/favorites/<int:book_id>/",
         FavoritoView.as_view(),
