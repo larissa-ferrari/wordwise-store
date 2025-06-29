@@ -41,10 +41,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# Migrations
-**/migrations/*.py
-!**/migrations/__init__.py
-
 # Media
 /media
 
