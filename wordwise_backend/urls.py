@@ -21,10 +21,14 @@ from .settings import schema_view
 from rest_framework.routers import DefaultRouter
 from category.views import CategoriaViewSet
 from user.views import UserViewSet
+from banner.views import BannerViewSet
+from support.views import SuporteViewSet
 
 router = DefaultRouter()
 router.register(r"categorias", CategoriaViewSet)
 router.register(r"usuarios", UserViewSet)
+router.register(r"banners", BannerViewSet)
+router.register(r"suportes", SuporteViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
