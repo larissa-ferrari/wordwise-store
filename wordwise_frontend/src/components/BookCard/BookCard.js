@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './BookCard.css';
 
-function BookCard({ title, price, image }) {
+function BookCard({ id, title, price, image }) {
   return (
     <div className="book-card">
       <div className="book-content">
@@ -9,7 +10,9 @@ function BookCard({ title, price, image }) {
         <img src={image} alt={title} />
         <p className="price">R$ {price}</p>
       </div>
-      <button className="buy-button">Compre agora</button>
+      <Link to={`/livro/${id}`}>
+        <button className="buy-button">Ver Detalhes</button>
+      </Link>
     </div>
   );
 }
