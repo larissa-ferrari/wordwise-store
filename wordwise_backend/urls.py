@@ -20,13 +20,16 @@ from django.urls import path, re_path, include
 from .settings import schema_view
 from rest_framework.routers import DefaultRouter
 from category.views import CategoriaViewSet
+from user.views import UserViewSet
 
 router = DefaultRouter()
 router.register(r"categorias", CategoriaViewSet)
-
+router.register(r"usuarios", UserViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/", include("user.urls")),
+
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
         schema_view.without_ui(cache_timeout=0),
