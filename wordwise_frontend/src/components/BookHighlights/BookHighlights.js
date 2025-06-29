@@ -1,11 +1,11 @@
 import React from 'react';
-import BookCard from './BookCard';
+import BookCard from '../BookCard/BookCard';
 import './BookHighlights.css';
 
-import pinoquio from '../assets/pinoquio.jpg';
-import estrelas from '../assets/estrelas.jpg';
-import alice from '../assets/alice.jpg';
-import dracula from '../assets/dracula.jpg';
+import pinoquio from '../../assets/books/pinoquio.jpg';
+import estrelas from '../../assets/books/estrelas.jpg';
+import alice from '../../assets/books/alice.jpg';
+import dracula from '../../assets/books/dracula.jpg';
 
 const books = [
   { title: 'Pinoquio', price: '54.90', image: pinoquio },

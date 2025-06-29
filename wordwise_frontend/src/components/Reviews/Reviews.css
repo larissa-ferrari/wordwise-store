@@ -1,0 +1,31 @@
+.reviews-container {
+  margin-top: 2rem;
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.reviews-container h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.review {
+  border-top: 1px solid #eee;
+  padding: 0.8rem 0;
+}
+
+.review:first-child {
+  border-top: none;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review .rating {
+  color: #f39c12;
+}
