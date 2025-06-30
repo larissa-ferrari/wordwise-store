@@ -1,86 +1,100 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import ShippingCalculator from "../../components/ShippingCalculator/ShippingCalculator";
 import Reviews from "../../components/Reviews/Reviews";
-import "./ProductDetail.css";
 import { FaHeart } from "react-icons/fa";
-
-
-const products = [
-  {
-    id: 1,
-    title: "Pinoquio",
-    price: "54.90",
-    author: "Carlo Collodi",
-    description: "Uma história clássica sobre um boneco de madeira que ganha vida.",
-    image: require("../../assets/books/pinoquio.jpg"),
-  },
-  {
-    id: 2,
-    title: "Em Algum Lugar nas Estrelas",
-    price: "49.90",
-    author: "Clare Vanderpool",
-    description: "Uma emocionante aventura repleta de descobertas e amizade.",
-    image: require("../../assets/books/estrelas.jpg"),
-  },
-  {
-    id: 3,
-    title: "Alice no País das Maravilhas",
-    price: "59.90",
-    author: "Lewis Carroll",
-    description: "Uma viagem mágica e surreal através do País das Maravilhas.",
-    image: require("../../assets/books/alice.jpg"),
-  },
-];
+import "./ProductDetail.css";
+import { buscarLivroPorId } from "../../api/bookApi";
+import { adicionarAoCarrinho } from "../../api/cartApi";
+import { toast } from "react-toastify"; // se usar notificações
 
 function ProductDetail() {
-  const { id } = useParams();
-  const product = products.find((p) => p.id === parseInt(id));
+    const { id } = useParams();
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-  if (!product) {
-    return (
-      <div>
-        <Navbar />
-        <div className="product-detail-wrapper">
-          <h2>Produto não encontrado.</h2>
-          <Link to="/livros" className="back-link">← Voltar para os produtos</Link>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+    useEffect(() => {
+        const fetchBook = async () => {
+            try {
+                const data = await buscarLivroPorId(id);
+                setProduct(data);
+            } catch (err) {
+                console.error("Erro ao buscar livro:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  return (
-    <div>
-      <Navbar />
-      <div className="product-detail-wrapper">
-        <div className="product-detail-card">
-          <div className="product-image">
-            <img src={product.image} alt={product.title} />
-          </div>
-          <div className="product-info">
-            <h1 className="product-title">{product.title}</h1>
-            <p className="product-author">por {product.author}</p>
-            <p className="product-description">{product.description}</p>
-            <p className="product-price">R$ {product.price}</p>
-            <div className="product-actions">
-                <button className="btn-buy">Adicionar ao Carrinho</button>
-                <button className="btn-favorite">
-                    <FaHeart className="heart-icon" />
-                    Favoritar
-                </button>
+        fetchBook();
+    }, [id]);
+
+
+    const handleAddToCart = async () => {
+        try {
+            await adicionarAoCarrinho(product.id, 1);
+            toast.success("Livro adicionado ao carrinho!");
+        } catch (error) {
+            console.error("Erro ao adicionar ao carrinho:", error);
+            toast.error("Erro ao adicionar ao carrinho.");
+        }
+    };
+
+    if (loading) {
+        return (
+            <div>
+                <Navbar />
+                <div className="product-detail-wrapper">
+                    <h2>Carregando...</h2>
+                </div>
+                <Footer />
             </div>
-            <ShippingCalculator />
-            <Link to="/livros" className="back-link">← Voltar para os produtos</Link>
-          </div>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div>
+                <Navbar />
+                <div className="product-detail-wrapper">
+                    <h2>Livro não encontrado.</h2>
+                    <Link to="/livros" className="back-link">← Voltar para os produtos</Link>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            <Navbar />
+            <div className="product-detail-wrapper">
+                <div className="product-detail-card">
+                    <div className="product-image">
+                        <img src={product.imagem_url} alt={product.titulo} />
+                    </div>
+                    <div className="product-info">
+                        <h1 className="product-title">{product.titulo}</h1>
+                        <p className="product-author">por {product.autor}</p>
+                        <p className="product-description">{product.descricao}</p>
+                        <p className="product-price">R$ {product.preco}</p>
+                        <div className="product-actions">
+                            <button className="btn-buy" onClick={handleAddToCart}>Adicionar ao Carrinho</button>
+                            <button className="btn-favorite">
+                                <FaHeart className="heart-icon" />
+                                Favoritar
+                            </button>
+                        </div>
+                        <ShippingCalculator />
+                        <Link to="/livros" className="back-link">← Voltar para os produtos</Link>
+                    </div>
+                </div>
+                <Reviews livroId={product.id} />
+            </div>
+            <Footer />
         </div>
-        <Reviews />
-      </div>
-      <Footer />
-    </div>
-  );
+    );
 }
 
 export default ProductDetail;

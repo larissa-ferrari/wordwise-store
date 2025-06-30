@@ -19,6 +19,9 @@ class Livro(models.Model):
     status = models.BooleanField(default=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ["titulo"]
+
     def __str__(self):
         return self.titulo
 

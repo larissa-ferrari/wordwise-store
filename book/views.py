@@ -12,15 +12,23 @@ from django.shortcuts import get_object_or_404
 from core.views import AuthenticatedModelViewSet
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
+from django.db.models import Avg
+import random
+
+
+class CustomPageNumberPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
 
 
 class LivroViewSet(AuthenticatedModelViewSet):
     queryset = Livro.objects.filter(status=True)
     serializer_class = LivroSerializer
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPageNumberPagination
 
     def get_permissions(self):
-        if self.action in ["list", "retrieve", "search", "avaliacoes"]:
+        if self.action in ["list", "retrieve", "search", "avaliacoes", "destaques"]:
             return [AllowAny()]
         return [IsAuthenticated()]
 
@@ -50,7 +58,6 @@ class LivroViewSet(AuthenticatedModelViewSet):
             queryset = queryset.filter(preco__lte=float(preco_max))
 
         page = self.paginate_queryset(queryset)
-
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
@@ -63,6 +70,29 @@ class LivroViewSet(AuthenticatedModelViewSet):
         livro = self.get_object()
         avaliacoes = Avaliacao.objects.filter(livro=livro)
         serializer = AvaliacaoSerializer(avaliacoes, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["get"], url_path="destaques")
+    def destaques(self, request):
+        livros_avaliados = (
+            self.get_queryset()
+            .annotate(media=Avg("avaliacao__nota"))
+            .order_by("-media")
+        )
+
+        livros_destacados = list(livros_avaliados[:4])
+
+        if len(livros_destacados) < 4:
+            faltando = 4 - len(livros_destacados)
+            outros = self.get_queryset().exclude(
+                id__in=[l.id for l in livros_destacados]
+            )
+            outros_aleatorios = random.sample(
+                list(outros), min(faltando, outros.count())
+            )
+            livros_destacados.extend(outros_aleatorios)
+
+        serializer = self.get_serializer(livros_destacados, many=True)
         return Response(serializer.data)
 
 

@@ -1,10 +1,9 @@
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, ListModelMixin
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
-from django.shortcuts import get_object_or_404
 from .models import Pedido, Transporte, MetodoPagamento, ItemPedido
 from cart.models import Carrinho
 from .serializers import (
@@ -13,6 +12,14 @@ from .serializers import (
     CriarPedidoSerializer,
     TransporteSerializer,
 )
+from rest_framework.pagination import PageNumberPagination
+
+
+class PedidoPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 50
+    page_query_param = "page"
 
 
 class PedidoViewSet(
@@ -20,34 +27,51 @@ class PedidoViewSet(
 ):
     permission_classes = [IsAuthenticated]
     queryset = Pedido.objects.none()
+    pagination_class = PedidoPagination
+    serializer_class = PedidoSerializer
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
             return self.queryset
 
         if self.request.user.is_authenticated:
-            return Pedido.objects.filter(cliente=self.request.user.cliente)
-        return Pedido.objects.filter(session_key=self.request.session.session_key)
+            queryset = Pedido.objects.filter(cliente=self.request.user.cliente)
+        else:
+            queryset = Pedido.objects.filter(
+                session_key=self.request.session.session_key
+            )
+
+        return queryset.order_by("-data_criacao")
 
     def get_serializer_class(self):
         if self.action == "create":
             return CriarPedidoSerializer
         return PedidoSerializer
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        status_filter = request.query_params.get("status")
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        transporte_id = serializer.validated_data["transporte"]
-        metodo_pagamento_id = serializer.validated_data["metodo_pagamento"]
+        transporte = serializer.validated_data["transporte_id"]
+        metodo_pagamento = serializer.validated_data["metodo_pagamento_id"]
         endereco_entrega = serializer.validated_data["endereco_entrega"]
         observacoes = serializer.validated_data.get("observacoes", "")
-
-        transporte = get_object_or_404(Transporte, id=transporte_id, ativo=True)
-        metodo_pagamento = get_object_or_404(
-            MetodoPagamento, id=metodo_pagamento_id, ativo=True
-        )
 
         carrinho = self._obter_carrinho_ativo()
 
@@ -79,7 +103,6 @@ class PedidoViewSet(
 
         itens_pedido = []
         for item_carrinho in itens_carrinho:
-            # Verificar estoque disponível
             if item_carrinho.livro.estoque < item_carrinho.quantidade:
                 return Response(
                     {
@@ -103,7 +126,7 @@ class PedidoViewSet(
             item_carrinho.livro.estoque -= item_carrinho.quantidade
             item_carrinho.livro.save(update_fields=["estoque"])
 
-        carrinho.status = "finalizado"
+        carrinho.status = "FINALIZADO"
         carrinho.save()
 
         pedido_serializer = PedidoSerializer(pedido)
@@ -127,14 +150,22 @@ class PedidoViewSet(
 
 
 class TransporteViewSet(GenericViewSet, ListModelMixin):
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
     queryset = Transporte.objects.filter(ativo=True)
     serializer_class = TransporteSerializer
     pagination_class = None
 
 
 class MetodoPagamentoViewSet(GenericViewSet, ListModelMixin):
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
     queryset = MetodoPagamento.objects.filter(ativo=True)
     serializer_class = MetodoPagamentoSerializer
     pagination_class = None

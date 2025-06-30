@@ -4,7 +4,7 @@ from rest_framework.mixins import (
 )
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 from .models import Carrinho, ItemCarrinho
 from .serializers import CarrinhoSerializer, AdicionarItemSerializer
@@ -13,8 +13,12 @@ import uuid
 
 
 class CarrinhoViewSet(GenericViewSet, RetrieveModelMixin):
-    permission_classes = [IsAuthenticated]
     serializer_class = CarrinhoSerializer
+
+    def get_permissions(self):
+        if self.action in ["adicionar_item", "remover_item"]:
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
