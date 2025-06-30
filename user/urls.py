@@ -1,20 +1,19 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-from .views import UserViewSet, ClienteViewSet
+from .views import ClienteViewSet
 from .views_favoritos import FavoritoView
 from .views_login import LoginView, LogoutView
 
 app_name = "user"
 
 router = DefaultRouter()
-router.register(r"usuarios", UserViewSet, basename="usuarios")
 router.register(r"clientes", ClienteViewSet, basename="clientes")
 
 urlpatterns = [
-    path("usuarios/login/", LoginView.as_view(), name="login"),
-    path("usuarios/logout/", LogoutView.as_view(), name="logout"),
+    path("clientes/login/", LoginView.as_view(), name="login"),
+    path("clientes/logout/", LogoutView.as_view(), name="logout"),
     path(
-        "usuarios/favorites/<int:book_id>/",
+        "clientes/favorites/<int:book_id>/",
         FavoritoView.as_view(),
         name="user-favorites",
     ),

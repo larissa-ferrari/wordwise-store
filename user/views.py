@@ -1,20 +1,11 @@
 from .models import User
-from .serializers import UserSerializer
 from core.views import AuthenticatedModelViewSet
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Cliente
 from .serializers import ClienteSerializer, CriarClienteSerializer
 
-
-class UserViewSet(AuthenticatedModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class ClienteViewSet(ModelViewSet):
+class ClienteViewSet(AuthenticatedModelViewSet):
     queryset = Cliente.objects.all()
-    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == "create":

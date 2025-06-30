@@ -124,6 +124,18 @@
   background-color: #ffffff32;
 }
 
+.erro-login {
+  background-color: rgba(180, 0, 0, 0.85);
+  color: #fff;
+  border: 1px solid #ff4d4f;
+  padding: 10px 15px;
+  margin-top: 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
+
 .login-register {
   font-size: 0.9em;
   color: #fff;

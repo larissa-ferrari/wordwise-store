@@ -1,18 +1,28 @@
-import React, { useState } from 'react';
-import './LoginForm.css';
-import mailIcon from '../../assets/icons/icon-mail.svg';
-import lockIcon from '../../assets/icons/icon-lock-closed.svg';
+import React, { useState } from "react";
+import "./LoginForm.css";
+import mailIcon from "../../assets/icons/icon-mail.svg";
+import lockIcon from "../../assets/icons/icon-lock-closed.svg";
+import { login } from "../../api/authApi";
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [erro, setErro] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('Remember Me:', rememberMe);
+    setErro("");
+    setLoading(true);
+
+    try {
+      await login(username, password);
+      window.location.href = "/";
+    } catch (err) {
+      setErro(err.detail || "Falha no login. Verifique seus dados.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -26,12 +36,12 @@ function Login() {
                 <img src={mailIcon} alt="Email Icon" />
               </span>
               <input
-                type="email"
+                type="text"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
-              <label>Email</label>
+              <label>Usuário</label>
             </div>
             <div className="input-box">
               <span className="icon">
@@ -42,26 +52,20 @@ function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
               />
               <label>Senha</label>
             </div>
             <div className="remember-forgot">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                />{' '}
-                Lembre-se de mim
-              </label>
               <a href="#">Esqueceu a senha?</a>
             </div>
             <button type="submit" className="btn">
-              Login
+              {loading ? "Logando..." : "Login"}
             </button>
+            {erro && <p className="erro-login">{erro}</p>}
             <div className="login-register">
               <p>
-                Não possui uma conta?{' '}
+                Não possui uma conta?{" "}
                 <a href="/cadastro" className="register-link">
                   Cadastre-se
                 </a>

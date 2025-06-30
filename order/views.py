@@ -1,4 +1,5 @@
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, ListModelMixin
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,6 +18,7 @@ from .serializers import (
 class PedidoViewSet(
     GenericViewSet, CreateModelMixin, RetrieveModelMixin, ListModelMixin
 ):
+    permission_classes = [IsAuthenticated]
     queryset = Pedido.objects.none()
 
     def get_queryset(self):
@@ -125,12 +127,14 @@ class PedidoViewSet(
 
 
 class TransporteViewSet(GenericViewSet, ListModelMixin):
+    permission_classes = [IsAuthenticated]
     queryset = Transporte.objects.filter(ativo=True)
     serializer_class = TransporteSerializer
     pagination_class = None
 
 
 class MetodoPagamentoViewSet(GenericViewSet, ListModelMixin):
+    permission_classes = [IsAuthenticated]
     queryset = MetodoPagamento.objects.filter(ativo=True)
     serializer_class = MetodoPagamentoSerializer
     pagination_class = None
