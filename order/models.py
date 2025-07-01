@@ -58,7 +58,7 @@ class Pedido(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_PEDIDO, default="PENDENTE")
     transporte = models.ForeignKey(Transporte, on_delete=models.PROTECT)
     metodo_pagamento = models.ForeignKey(MetodoPagamento, on_delete=models.PROTECT)
-    endereco_entrega = models.JSONField()  # Armazena dados do endereço
+    endereco_entrega = models.JSONField()
     observacoes = models.TextField(blank=True)
 
     class Meta:

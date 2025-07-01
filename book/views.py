@@ -14,8 +14,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Avg
 import random
-from rest_framework.authentication import TokenAuthentication
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import FilterSet, filters
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import mixins, viewsets
+
 
 class CustomPageNumberPagination(PageNumberPagination):
     page_size = 10
@@ -23,10 +27,22 @@ class CustomPageNumberPagination(PageNumberPagination):
     max_page_size = 100
 
 
+class LivroFilter(FilterSet):
+    categoria = filters.CharFilter(field_name="categoria__nome", lookup_expr="iexact")
+    autor = filters.CharFilter(field_name="autor", lookup_expr="icontains")
+    tipo = filters.CharFilter(field_name="tipo", lookup_expr="icontains")
+
+    class Meta:
+        model = Livro
+        fields = ["autor", "categoria", "tipo"]
+
+
 class LivroViewSet(AuthenticatedModelViewSet):
     queryset = Livro.objects.filter(status=True)
     serializer_class = LivroSerializer
     pagination_class = CustomPageNumberPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = LivroFilter
 
     def get_permissions(self):
         if self.action in ["list", "retrieve", "search", "avaliacoes", "destaques"]:
@@ -97,12 +113,11 @@ class LivroViewSet(AuthenticatedModelViewSet):
         return Response(serializer.data)
 
 
-
 class AvaliacaoViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
-    viewsets.GenericViewSet
+    viewsets.GenericViewSet,
 ):
     queryset = Avaliacao.objects.all()
     serializer_class = AvaliacaoSerializer
@@ -118,9 +133,12 @@ class AvaliacaoViewSet(
         livro = get_object_or_404(Livro, pk=self.request.data.get("livro_id"))
         cliente = get_object_or_404(Cliente, user=self.request.user)
         serializer.save(livro=livro, cliente=cliente)
-        
+
+
 class ClienteFavoritosViewSet(AuthenticatedModelViewSet):
     serializer_class = ClienteFavoritosSerializer
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):

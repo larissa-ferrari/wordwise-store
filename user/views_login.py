@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from cart.models import Carrinho, ItemCarrinho
 from user.models import Cliente
+from utils.cart import get_carrinho_anonimo_por_sessao
 
 
 class LoginView(ObtainAuthToken):
@@ -31,7 +32,7 @@ class LoginView(ObtainAuthToken):
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        token, created = Token.objects.get_or_create(user=user)
+        token, _ = Token.objects.get_or_create(user=user)
 
         session_key = request.session.session_key
         if not session_key:
@@ -46,34 +47,28 @@ class LoginView(ObtainAuthToken):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        try:
-            carrinho_anonimo = Carrinho.objects.get(
-                session_key=session_key, status="ativo"
-            )
-        except Carrinho.DoesNotExist:
-            carrinho_anonimo = None
+        carrinho_anonimo = get_carrinho_anonimo_por_sessao(request)
 
         if carrinho_anonimo:
-            carrinho_cliente, created = Carrinho.objects.get_or_create(
+            carrinho_cliente, _ = Carrinho.objects.get_or_create(
                 cliente=cliente, status="ativo"
             )
 
-            if created:
-                carrinho_anonimo.cliente = cliente
-                carrinho_anonimo.session_key = None
-                carrinho_anonimo.identificador = None
-                carrinho_anonimo.save()
-            else:
-                for item in carrinho_anonimo.itemcarrinho_set.all():
-                    item_existente, criado = ItemCarrinho.objects.get_or_create(
-                        carrinho=carrinho_cliente,
-                        livro=item.livro,
-                        defaults={"quantidade": item.quantidade},
-                    )
-                    if not criado:
-                        item_existente.quantidade += item.quantidade
-                        item_existente.save()
-                carrinho_anonimo.delete()
+            for item in carrinho_anonimo.itemcarrinho_set.all():
+                item_existente = ItemCarrinho.objects.filter(
+                    carrinho=carrinho_cliente, livro=item.livro
+                ).first()
+
+                if item_existente:
+                    item_existente.quantidade += item.quantidade
+                    item_existente.save()
+                else:
+                    item.carrinho = carrinho_cliente
+                    item.save()
+
+            carrinho_anonimo.delete()
+
+            request.session.pop("carrinho_id", None)
 
         return Response(
             {

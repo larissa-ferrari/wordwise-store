@@ -4,7 +4,8 @@ from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, ListMode
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
-
+from rest_framework.authentication import TokenAuthentication
+from user.auth import UnsafeSessionAuthentication
 from user.models import Cliente
 from .models import Pedido, Transporte, MetodoPagamento, ItemPedido
 from cart.models import Carrinho
@@ -27,6 +28,8 @@ class PedidoPagination(PageNumberPagination):
 class PedidoViewSet(
     GenericViewSet, CreateModelMixin, RetrieveModelMixin, ListModelMixin
 ):
+    authentication_classes = [TokenAuthentication, UnsafeSessionAuthentication]
+
     def get_permissions(self):
         if self.action in ["create"]:
             return [AllowAny()]
@@ -139,8 +142,7 @@ class PedidoViewSet(
             item_carrinho.livro.estoque -= item_carrinho.quantidade
             item_carrinho.livro.save(update_fields=["estoque"])
 
-        carrinho.status = "FINALIZADO"
-        carrinho.save()
+        carrinho.delete()
 
         pedido_serializer = PedidoSerializer(pedido)
         return Response(pedido_serializer.data, status=status.HTTP_201_CREATED)

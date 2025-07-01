@@ -6,12 +6,13 @@ import "./Cart.css";
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { isAuthenticated } from '../../utils/auth';
+import { useCarrinho } from "../../contexts/cartContext";
 
 function Cart() {
     const [carrinho, setCarrinho] = useState(null);
     const [loading, setLoading] = useState(true);
-
     const navigate = useNavigate();
+    const { atualizarCarrinho } = useCarrinho();
 
     useEffect(() => {
         async function carregarCarrinho() {
@@ -41,6 +42,7 @@ function Cart() {
         try {
             const novoCarrinho = await removerItemDoCarrinho(livroId);
             setCarrinho(novoCarrinho);
+            await atualizarCarrinho();
         } catch (err) {
             console.error("Erro ao remover item:", err);
         }

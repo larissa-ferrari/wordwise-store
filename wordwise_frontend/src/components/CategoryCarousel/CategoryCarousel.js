@@ -1,35 +1,54 @@
-import React from 'react';
-import './CategoryCarousel.css';
-import lancamentosImg from '../../assets/categories/lancamentos.jpg';
-import maisVendidosImg from '../../assets/categories/mais-vendidos.jpg';
-import promocoesImg from '../../assets/categories/promocoes.jpg';
-import boxImg from '../../assets/categories/box.jpg';
-
-const categories = [
-  { name: 'LANÇAMENTOS', image: lancamentosImg },
-  { name: 'MAIS VENDIDOS', image: maisVendidosImg },
-  { name: 'PROMOÇÕES', image: promocoesImg },
-  { name: 'BOX E COLEÇÕES', image: boxImg }
-];
+import React, { useEffect, useState } from "react";
+import { obterCategorias } from "../../api/categoryApi";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "./CategoryCarousel.css";
+import { Link } from "react-router-dom";
 
 function CategoryCarousel() {
-  return (
-    <section className="carousel-section">
-      <div className="category-carousel">
-        {categories.map((cat, index) => (
-          <div className="category-item" key={index}>
-            <img src={cat.image} alt={cat.name} />
-            <p>{cat.name}</p>
-          </div>
-        ))}
-      </div>
-      <div className="carousel-indicators">
-        {categories.map((_, i) => (
-          <span key={i} className={`dot ${i === 0 ? 'active' : ''}`} />
-        ))}
-      </div>
-    </section>
-  );
+    const [categorias, setCategorias] = useState([]);
+
+    useEffect(() => {
+        async function fetchCategorias() {
+            try {
+                const data = await obterCategorias();
+                setCategorias(data);
+            } catch (error) {
+                console.error("Erro ao buscar categorias:", error);
+            }
+        }
+
+        fetchCategorias();
+    }, []);
+
+    return (
+        <section className="carousel-section">
+            <div className="category-carousel">
+                <Swiper
+                    modules={[Navigation, Pagination]}
+                    slidesPerView={4}
+                    spaceBetween={10}
+                    pagination={{ clickable: true }}
+                    loop={categorias.length > 4}
+                    className="category-swiper"
+                >
+                    {categorias.map((cat) => (
+                        <SwiperSlide key={cat.id}>
+                            <Link to={`/livros?categoria=${encodeURIComponent(cat.nome)}`}>
+                                <div className="category-item">
+                                    <img src={cat.imagem_url} alt={cat.nome} />
+                                    <p>{cat.nome.toUpperCase()}</p>
+                                </div>
+                            </Link>
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
+            </div>
+        </section>
+    );
 }
 
 export default CategoryCarousel;
