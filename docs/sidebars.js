@@ -14,7 +14,7 @@ const sidebars = {
         'technologies',
         'architecture',
         'modules',
-        'database',
+        'diagrams',
       ],
     },
   ],

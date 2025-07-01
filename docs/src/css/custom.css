@@ -28,3 +28,18 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+.markdown a[href$=".pdf"] {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  background: #f44;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.markdown a[href$=".pdf"]:hover {
+  background: #d22;
+}
