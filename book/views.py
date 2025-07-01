@@ -14,7 +14,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Avg
 import random
-
+from rest_framework.authentication import TokenAuthentication
+from rest_framework import mixins, viewsets
 
 class CustomPageNumberPagination(PageNumberPagination):
     page_size = 10
@@ -96,16 +97,28 @@ class LivroViewSet(AuthenticatedModelViewSet):
         return Response(serializer.data)
 
 
-class AvaliacaoViewSet(AuthenticatedModelViewSet):
+
+class AvaliacaoViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet
+):
     queryset = Avaliacao.objects.all()
     serializer_class = AvaliacaoSerializer
+    authentication_classes = [TokenAuthentication]
+    http_method_names = ["get", "post"]
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def perform_create(self, serializer):
         livro = get_object_or_404(Livro, pk=self.request.data.get("livro_id"))
         cliente = get_object_or_404(Cliente, user=self.request.user)
         serializer.save(livro=livro, cliente=cliente)
-
-
+        
 class ClienteFavoritosViewSet(AuthenticatedModelViewSet):
     serializer_class = ClienteFavoritosSerializer
 

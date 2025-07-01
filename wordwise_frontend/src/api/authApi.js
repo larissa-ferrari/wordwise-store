@@ -20,11 +20,3 @@ export async function logout() {
   localStorage.removeItem("username");
   window.location.href = "/login";
 }
-
-export function isAuthenticated() {
-  return !!localStorage.getItem("token");
-}
-
-export function getUsername() {
-  return localStorage.getItem("username");
-}

@@ -13,13 +13,18 @@ class ClienteViewSet(AuthenticatedModelViewSet):
         return ClienteSerializer
 
     def get_permissions(self):
-        if self.action in ["create"]:
+        if self.action in ["create", "partial_update"]:
             return []
-        elif self.action in ["destroy", "update", "partial_update"]:
+        elif self.action in ["destroy", "update"]:
             return [IsAdminUser()]
         return super().get_permissions()
-
+    
     def get_queryset(self):
-        if self.request.user.is_staff:
-            return self.queryset
-        return self.queryset.filter(user=self.request.user)
+        if self.action in ["create", "partial_update"]:
+            return self.queryset 
+        user = self.request.user
+        if user.is_authenticated:
+            if user.is_staff:
+                return self.queryset
+            return self.queryset.filter(user=user)
+        return self.queryset.none()
