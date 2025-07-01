@@ -12,6 +12,7 @@ class LivroSerializer(serializers.ModelSerializer):
 class AvaliacaoSerializer(serializers.ModelSerializer):
     cliente = serializers.StringRelatedField()
     livro = serializers.StringRelatedField()
+    livro_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Avaliacao

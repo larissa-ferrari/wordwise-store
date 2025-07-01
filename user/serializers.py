@@ -35,6 +35,21 @@ class ClienteSerializer(serializers.ModelSerializer):
         fields = ["user", "cpf", "enderecos"]
 
 
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user", None)
+
+        instance = super().update(instance, validated_data)
+
+        if user_data:
+            user = instance.user
+            for attr, value in user_data.items():
+                if attr == "password":
+                    user.set_password(value)
+                else:
+                    setattr(user, attr, value)
+            user.save()
+        return instance
+
 class CriarClienteSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     password = serializers.CharField(write_only=True, required=True)

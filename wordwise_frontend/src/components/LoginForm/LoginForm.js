@@ -57,7 +57,7 @@ function Login() {
               <label>Senha</label>
             </div>
             <div className="remember-forgot">
-              <a href="#">Esqueceu a senha?</a>
+              <a href="/resetar-senha">Esqueceu a senha?</a>
             </div>
             <button type="submit" className="btn">
               {loading ? "Logando..." : "Login"}
