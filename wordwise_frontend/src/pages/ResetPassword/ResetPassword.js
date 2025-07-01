@@ -42,7 +42,7 @@ function ResetPassword() {
 
     try {
       // MOCKANDO CLIENTE ID QUE SERIA RETORNADO PELO EMAIL
-      const clienteId = 8;
+      const clienteId = 3;
 
       const payload = {
         user: {

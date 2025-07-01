@@ -27,7 +27,7 @@ function Navbar() {
                 <li><Link to="/livros?autor=Machado">AUTORES</Link></li> */}
                 <li><Link to="/livros?tipo=ebook">EBOOKS</Link></li>
                 <li><Link to="/livros?tipo=audiobook">AUDIOBOOKS</Link></li>
-                <li><Link to="/contato">CONTATO</Link></li>
+                <li><Link to="/suporte">SUPORTE</Link></li>
                 <li><Link to="/carrinho">🛒 Carrinho ({quantidadeCarrinho})</Link></li>
                 {autenticado ? (
                     <>

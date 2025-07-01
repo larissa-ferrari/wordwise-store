@@ -14,7 +14,7 @@ title: Tecnologias Utilizadas
 
 ## Back-End
 
-- **Python + Django:** Framework robusto MVC.
+- **Python + Django:** Framework.
 - **Django REST Framework:** Construção das APIs REST.
 - **Swagger e ReDoc:** Documentação interativa das APIs.
 - **JWT e autenticação por token:** Segurança das rotas.
