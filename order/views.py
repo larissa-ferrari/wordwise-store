@@ -4,6 +4,8 @@ from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, ListMode
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
+
+from user.models import Cliente
 from .models import Pedido, Transporte, MetodoPagamento, ItemPedido
 from cart.models import Carrinho
 from .serializers import (
@@ -25,7 +27,11 @@ class PedidoPagination(PageNumberPagination):
 class PedidoViewSet(
     GenericViewSet, CreateModelMixin, RetrieveModelMixin, ListModelMixin
 ):
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.action in ["create"]:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
     queryset = Pedido.objects.none()
     pagination_class = PedidoPagination
     serializer_class = PedidoSerializer
@@ -95,7 +101,14 @@ class PedidoViewSet(
         }
 
         if self.request.user.is_authenticated:
-            pedido_data["cliente"] = self.request.user.cliente
+            try:
+                cliente = self.request.user.cliente
+                pedido_data["cliente"] = cliente
+            except Cliente.DoesNotExist:
+                return Response(
+                    {"erro": "Usuário autenticado não possui cliente associado."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
             pedido_data["session_key"] = self.request.session.session_key
 
