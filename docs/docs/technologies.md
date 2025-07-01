@@ -28,4 +28,3 @@ title: Tecnologias Utilizadas
 
 - Princípios SOLID.
 - APIs REST desacopladas do front-end.
-- Padrão MVC.
