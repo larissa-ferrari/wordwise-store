@@ -29,10 +29,15 @@ function CategoryCarousel() {
             <div className="category-carousel">
                 <Swiper
                     modules={[Navigation, Pagination]}
-                    slidesPerView={4}
-                    spaceBetween={10}
+                    loop={categorias.length > 6}
                     pagination={{ clickable: true }}
-                    loop={categorias.length > 4}
+                    navigation
+                    breakpoints={{
+                        320: { slidesPerView: 2, spaceBetween: 10 },
+                        640: { slidesPerView: 3, spaceBetween: 10 },
+                        1024: { slidesPerView: 5, spaceBetween: 8 },
+                        1280: { slidesPerView: 6, spaceBetween: 8 },
+                    }}
                     className="category-swiper"
                 >
                     {categorias.map((cat) => (

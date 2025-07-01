@@ -34,7 +34,6 @@ class ClienteSerializer(serializers.ModelSerializer):
         model = Cliente
         fields = ["user", "cpf", "enderecos"]
 
-
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user", None)
 
@@ -49,6 +48,7 @@ class ClienteSerializer(serializers.ModelSerializer):
                     setattr(user, attr, value)
             user.save()
         return instance
+
 
 class CriarClienteSerializer(serializers.ModelSerializer):
     user = UserSerializer()
@@ -65,12 +65,15 @@ class CriarClienteSerializer(serializers.ModelSerializer):
         if len(cpf) != 11:
             raise serializers.ValidationError("CPF deve conter 11 dígitos")
 
+        if Cliente.objects.filter(cpf=cpf).exists():
+            raise serializers.ValidationError("CPF já está em uso.")
+
         return cpf
 
     def create(self, validated_data):
         user_data = validated_data.pop("user")
         password = validated_data.pop("password")
-        cpf = validated_data.pop("cpf")
+        cpf = re.sub(r"[^0-9]", "", validated_data.pop("cpf"))
 
         user = User.objects.create_user(
             username=user_data["username"],
